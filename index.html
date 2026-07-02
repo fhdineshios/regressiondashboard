@@ -64,8 +64,8 @@
 
   .themebtn {
     width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
-    border: 1px solid var(--border2); background: var(--card);
-    font-size: 17px; line-height: 1; display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--border2); background: var(--card); color: var(--text);
+    font-size: 18px; line-height: 1; display: flex; align-items: center; justify-content: center;
     transition: transform .15s, background .15s;
   }
   .themebtn:hover { transform: rotate(15deg) scale(1.06); background: var(--card2); }
@@ -85,8 +85,11 @@
   .chip.all.on { background: var(--allon); color: var(--allonfg); border-color: var(--allon); font-weight: 600; }
   .chip.pass.on { background: var(--passbg); color: var(--passfg); border-color: var(--passbd); font-weight: 600; }
   .chip.fail.on { background: var(--failbg); color: var(--failfg); border-color: var(--failbd); font-weight: 600; }
-  .chip.blocked.on { background: var(--blockbg); color: var(--blockfg); border-color: var(--blockbd); font-weight: 600; }
-  .chip.na.on, .chip.remaining.on { background: var(--neutbg); color: var(--text); border-color: var(--faint); font-weight: 600; }
+  .chip.blocked.on { background: #fac775; color: #4a2f04; border-color: #ba7517; font-weight: 600; }
+  [data-theme="dark"] .chip.blocked.on { background: #5c3f0e; color: #fac775; border-color: #ef9f27; }
+  .chip.na.on { background: #e6f1fb; color: #0c447c; border-color: #85b7eb; font-weight: 600; }
+  [data-theme="dark"] .chip.na.on { background: #12283d; color: #b5d4f4; border-color: #378add; }
+  .chip.remaining.on { background: var(--neutbg); color: var(--text); border-color: var(--faint); font-weight: 600; }
 
   .controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
   input[type="search"], select {
@@ -198,12 +201,11 @@ var allRows = [];
 var activeStatus = "All";
 var sortKey = "sno", sortDir = 1;
 
-// Theme: saved choice wins, otherwise follow system
+// Theme: light (white) by default; dark only if the viewer chose it before
 (function () {
   var saved = null;
   try { saved = localStorage.getItem("theme"); } catch (e) {}
-  var dark = saved ? saved === "dark" : window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  if (dark) document.documentElement.setAttribute("data-theme", "dark");
+  if (saved === "dark") document.documentElement.setAttribute("data-theme", "dark");
 })();
 function themeIcon() {
   var dark = document.documentElement.getAttribute("data-theme") === "dark";
