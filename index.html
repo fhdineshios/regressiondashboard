@@ -102,7 +102,6 @@
     font-size: 17px; display: flex; align-items: center; justify-content: center; transition: transform .15s;
   }
   .themebtn:hover { transform: rotate(15deg) scale(1.06); }
-  #filepick { display: none; }
 
   /* ---------- KPI cards ---------- */
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
@@ -112,7 +111,7 @@
     box-shadow: var(--shadow); transition: transform .12s, border-color .15s;
   }
   .kpi:hover { transform: translateY(-1px); }
-  .kpi.on { border-color: var(--accent); outline: 1px solid var(--accent); }
+  .kpi.on { border-color: var(--kc, var(--accent)); outline: 2px solid var(--kc, var(--accent)); }
   .kpi .ic {
     width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
@@ -131,7 +130,7 @@
   .panel h3 { font-size: 13.5px; font-weight: 650; margin-bottom: 12px; }
   .bigbar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--track); margin-bottom: 12px; }
   .bigbar div { width: 0; transition: width .8s ease; }
-  .bigpct { font-size: 26px; font-weight: 750; text-align: right; margin-bottom: 6px; }
+  .bigpct { font-size: 44px; font-weight: 800; text-align: right; margin-bottom: 8px; line-height: 1; }
   .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; font-size: 12px; color: var(--text2); }
   .legend .dot { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; }
   .mini { margin-bottom: 10px; }
@@ -231,6 +230,7 @@
     <div class="toprow">
       <div class="titleblock">
         <h1 id="title">Regression</h1><span class="badge">Active</span>
+        <a class="btn primary" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:12px;vertical-align:6px">Open Jira Filter &#8599;</a>
         <div class="metas">
           <div class="meta"><div class="k">Last updated</div><div class="v" id="mUpdated">–</div></div>
           <div class="meta"><div class="k">Total features</div><div class="v" id="mTotal">–</div></div>
@@ -238,10 +238,6 @@
         </div>
       </div>
       <div class="actions">
-        <label class="btn" for="filepick">Preview CSV</label>
-        <input type="file" id="filepick" accept=".csv">
-        <button class="btn" id="exportbtn">Export CSV</button>
-        <a class="btn primary" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none">Open Jira Filter &#8599;</a>
         <button class="themebtn" id="themebtn" aria-label="Toggle dark mode" title="Toggle dark / light theme">&#9789;</button>
       </div>
     </div>
@@ -494,7 +490,9 @@ function render(animate) {
   defs.forEach(function (d) {
     var pct = total ? Math.round((d.key === "" ? 100 : d.n / total * 100) * 10) / 10 : 0;
     var div = document.createElement("div");
-    div.className = "kpi" + (state.status === d.key && d.key ? " on" : "");
+    var on = d.key ? state.status === d.key : state.status === "";
+    div.className = "kpi" + (on ? " on" : "");
+    div.style.setProperty("--kc", d.col);
     div.innerHTML = '<div class="ic" style="background:' + d.bg + ';color:' + d.col + '">' + kpiIcon(d.key || "Total") + "</div>" +
       '<div><div class="lab">' + d.label + '</div><div class="num">' + d.n +
       '<span class="pct" style="color:' + d.col + '">' + pct + "%</span></div></div>";
@@ -688,24 +686,6 @@ document.querySelectorAll("th").forEach(function (th) {
     render(false);
   });
 });
-document.getElementById("exportbtn").addEventListener("click", function () {
-  var rows = filtered();
-  var out = [["Feature", "Team", "QA", "Status", "Jira", "Comments"]];
-  rows.forEach(function (r) { out.push([r.feature, r.team, r.qa, r.status, r.jira, r.comments]); });
-  var blob = new Blob([Papa.unparse(out)], { type: "text/csv" });
-  var a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "regression-export.csv";
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
-document.getElementById("filepick").addEventListener("change", function (e) {
-  var file = e.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function () { load(reader.result, "Local preview"); };
-  reader.readAsText(file);
-});
 
 fetch("data.csv?v=" + Date.now())
   .then(function (r) {
@@ -719,7 +699,7 @@ fetch("data.csv?v=" + Date.now())
   .catch(function () {
     document.getElementById("mUpdated").textContent = "data.csv not found";
     document.getElementById("msg").style.display = "block";
-    document.getElementById("msg").textContent = "Couldn't load data.csv — make sure it's in the same folder, or use Preview CSV.";
+    document.getElementById("msg").textContent = "Couldn't load data.csv — make sure a file named data.csv is in the same folder as index.html.";
   });
 </script>
 </body>
