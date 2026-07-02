@@ -9,84 +9,131 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #fafaf8; color: #1f2328; line-height: 1.5;
-    padding: 32px 16px 64px;
+    background: #f7f7f4; color: #1f2328; line-height: 1.5;
+    padding: 28px 16px 64px;
   }
-  .wrap { max-width: 900px; margin: 0 auto; }
-  header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-  h1 { font-size: 20px; font-weight: 600; }
-  .updated { font-size: 12px; color: #8b8b86; }
-  .bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; background: #e8e8e4; margin-bottom: 10px; }
-  .bar div { transition: width .4s ease; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+
+  .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+  h1 { font-size: 21px; font-weight: 650; }
+  .sub { font-size: 12.5px; color: #8b8b86; margin-top: 2px; }
+  .jirabtn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; font-weight: 500; color: #185fa5;
+    background: #e6f1fb; border: 1px solid #b5d4f4; border-radius: 8px;
+    padding: 7px 14px; text-decoration: none; margin-top: 8px;
+    transition: background .15s;
+  }
+  .jirabtn:hover { background: #d3e6f8; }
+  .ringbox { display: flex; align-items: center; gap: 10px; }
+  .ringlabel { font-size: 12px; color: #5f5e5a; line-height: 1.35; }
+  .ring circle.fg { transition: stroke-dashoffset 1s ease; }
+
+  .bar { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: #e8e8e4; margin-bottom: 14px; }
+  .bar div { width: 0; transition: width .8s ease; }
   .bar .p { background: #1d9e75; }
   .bar .f { background: #e24b4a; }
-  .summary { font-size: 14px; color: #5f5e5a; margin-bottom: 24px; }
-  .summary .g { color: #0f6e56; font-weight: 600; }
-  .summary .r { color: #a32d2d; font-weight: 600; }
-  .controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .bar .b { background: #ef9f27; }
+
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .chip {
+    font: inherit; font-size: 13px; padding: 5px 14px; border-radius: 16px; cursor: pointer;
+    background: #fff; color: #5f5e5a; border: 1px solid #d9d9d4; transition: all .15s;
+  }
+  .chip:hover { border-color: #b4b2a9; }
+  .chip.pass.on { background: #e1f5ee; color: #085041; border-color: #5dcaa5; font-weight: 600; }
+  .chip.fail.on { background: #fcebeb; color: #791f1f; border-color: #f09595; font-weight: 600; }
+  .chip.blocked.on { background: #faeeda; color: #633806; border-color: #fac775; font-weight: 600; }
+  .chip.na.on, .chip.remaining.on { background: #ececea; color: #444441; border-color: #b4b2a9; font-weight: 600; }
+
+  .controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
   input[type="search"], select {
     font: inherit; font-size: 14px; padding: 8px 12px;
     border: 1px solid #d9d9d4; border-radius: 8px; background: #fff; color: inherit;
   }
-  input[type="search"] { flex: 1; min-width: 180px; }
+  input[type="search"] { flex: 1; min-width: 170px; }
   input[type="search"]:focus, select:focus { outline: 2px solid #b5d4f4; border-color: #378add; }
+
   .tablebox { border: 1px solid #e2e2dd; border-radius: 12px; overflow: hidden; background: #fff; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-  th { text-align: left; padding: 10px 12px; background: #f4f4f1; color: #5f5e5a; font-weight: 600; font-size: 12.5px; }
+  th {
+    text-align: left; padding: 10px 12px; background: #f4f4f1; color: #5f5e5a;
+    font-weight: 600; font-size: 12.5px; cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  th:hover { color: #1f2328; }
+  th .dir { font-size: 10px; }
   td { padding: 9px 12px; border-top: 1px solid #eeeeea; vertical-align: top; }
+  tbody tr { transition: background .12s; }
+  tbody tr:hover { background: #f7f9fb; }
+  tr.bad { background: #fdf3f3; }
+  tr.bad:hover { background: #fbeaea; }
   tr.has-reason td:first-child { cursor: pointer; }
+  .teamtag { display: inline-block; font-size: 11px; background: #f1efe8; color: #5f5e5a; padding: 2px 8px; border-radius: 8px; }
   .pill { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: 10px; white-space: nowrap; }
   .pill.pass { background: #e1f5ee; color: #085041; }
   .pill.fail { background: #fcebeb; color: #791f1f; }
   .pill.blocked { background: #faeeda; color: #633806; }
   .pill.na { background: #f1efe8; color: #5f5e5a; }
   .pill.remaining { background: #f1efe8; color: #888780; }
+  .apptag { display: inline-block; font-size: 10.5px; margin-left: 4px; padding: 1px 7px; border-radius: 8px; background: #fcebeb; color: #791f1f; }
   a { color: #185fa5; text-decoration: none; }
   a:hover { text-decoration: underline; }
   .dash { color: #b4b2a9; }
-  .reason { font-size: 12.5px; color: #6b6a65; margin-top: 4px; display: none; white-space: pre-wrap; }
+  .reason { font-size: 12.5px; color: #6b6a65; margin-top: 5px; display: none; white-space: pre-wrap; background: #f7f7f4; border-radius: 6px; padding: 8px 10px; }
   tr.open .reason { display: block; }
   .hint { font-size: 11px; color: #b4b2a9; }
   .footer { margin-top: 16px; font-size: 12px; color: #8b8b86; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
   .footer label { cursor: pointer; color: #185fa5; }
   #filepick { display: none; }
   #msg { padding: 24px; text-align: center; color: #8b8b86; font-size: 14px; }
-  @media (max-width: 600px) {
-    th.qa-col, td.qa-col { display: none; }
-    body { padding: 20px 10px 48px; }
+  @media (max-width: 640px) {
+    th.hide-m, td.hide-m { display: none; }
+    body { padding: 18px 10px 48px; }
+    .top { align-items: flex-start; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1>Regression progress</h1>
-    <div class="updated" id="updated"></div>
-  </header>
+  <div class="top">
+    <div>
+      <h1 id="title">Regression progress</h1>
+      <div class="sub" id="updated"></div>
+      <a class="jirabtn" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none">
+        Open Jira defect filter <span aria-hidden="true">&#8599;</span>
+      </a>
+    </div>
+    <div class="ringbox">
+      <svg class="ring" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pass rate">
+        <circle cx="32" cy="32" r="27" fill="none" stroke="#e8e8e4" stroke-width="7"/>
+        <circle class="fg" cx="32" cy="32" r="27" fill="none" stroke="#1d9e75" stroke-width="7"
+          stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"
+          transform="rotate(-90 32 32)"/>
+        <text id="ringpct" x="32" y="37" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2328">–</text>
+      </svg>
+      <div class="ringlabel">pass rate<br>of tested</div>
+    </div>
+  </div>
 
-  <div class="bar" id="bar"></div>
-  <div class="summary" id="summary">Loading data.csv...</div>
+  <div class="bar" id="bar"><div class="p"></div><div class="f"></div><div class="b"></div></div>
+
+  <div class="chips" id="chips"></div>
 
   <div class="controls">
     <input type="search" id="search" placeholder="Search features, QA, Jira...">
-    <select id="statusFilter">
-      <option value="">All statuses</option>
-      <option value="Pass">Passed</option>
-      <option value="Fail">Failed</option>
-      <option value="Blocked">Blocked</option>
-      <option value="NA">NA</option>
-      <option value="Remaining">Remaining</option>
-    </select>
+    <select id="teamFilter"><option value="">All teams</option></select>
+    <select id="qaFilter"><option value="">All QA</option></select>
   </div>
 
   <div class="tablebox">
     <table>
       <thead>
         <tr>
-          <th style="width:46%">Feature</th>
-          <th class="qa-col" style="width:16%">QA</th>
-          <th style="width:16%">Status</th>
-          <th style="width:22%">Jira</th>
+          <th data-k="feature" style="width:38%">Feature <span class="dir"></span></th>
+          <th data-k="team" class="hide-m" style="width:11%">Team <span class="dir"></span></th>
+          <th data-k="qa" style="width:15%">QA <span class="dir"></span></th>
+          <th data-k="status" style="width:15%">Status <span class="dir"></span></th>
+          <th data-k="jira" style="width:21%">Jira <span class="dir"></span></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -95,15 +142,17 @@
   </div>
 
   <div class="footer">
-    <span>Rows with a note show a small marker — click the feature name to read it.</span>
+    <span>Click a status chip to filter · click a feature with a ● note to expand it</span>
     <label>Preview a local CSV<input type="file" id="filepick" accept=".csv"></label>
   </div>
 </div>
 
 <script>
 var JIRA_BASE = "https://touch2success.atlassian.net/browse/";
+var STATUSES = ["Pass", "Fail", "Blocked", "NA", "Remaining"];
 var allRows = [];
-var cols = {};
+var activeStatus = "";
+var sortKey = "sno", sortDir = 1;
 
 function norm(v) { return (v || "").toString().trim(); }
 
@@ -117,13 +166,8 @@ function statusOf(raw) {
   return "Remaining";
 }
 
-function findCol(headers, patterns) {
-  for (var i = 0; i < patterns.length; i++) {
-    for (var j = 0; j < headers.length; j++) {
-      if (patterns[i].test(headers[j])) return headers[j];
-    }
-  }
-  return null;
+function esc(s) {
+  return norm(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function jiraCell(raw) {
@@ -135,110 +179,221 @@ function jiraCell(raw) {
     var p = parts[i];
     if (/^https?:\/\//i.test(p)) {
       var id = p.split("/").pop();
-      out.push('<a href="' + p + '" target="_blank" rel="noopener">' + id + '</a>');
+      out.push('<a href="' + esc(p) + '" target="_blank" rel="noopener">' + esc(id) + ' &#8599;</a>');
     } else if (/^[A-Za-z][A-Za-z0-9]+-\d+$/.test(p)) {
-      out.push('<a href="' + JIRA_BASE + p + '" target="_blank" rel="noopener">' + p + '</a>');
+      out.push('<a href="' + JIRA_BASE + p + '" target="_blank" rel="noopener">' + esc(p) + ' &#8599;</a>');
     } else {
-      out.push(p);
+      out.push(esc(p));
     }
   }
   return out.join("<br>");
 }
 
-function esc(s) {
-  return norm(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function findCol(headers, patterns, exclude) {
+  for (var i = 0; i < patterns.length; i++) {
+    for (var j = 0; j < headers.length; j++) {
+      if (patterns[i].test(headers[j]) && (!exclude || !exclude.test(headers[j]))) return j;
+    }
+  }
+  return -1;
 }
 
 function load(csvText, updatedText) {
-  var res = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-  var headers = res.meta.fields || [];
-  cols.feature = findCol(headers, [/feature/i]) || headers[1] || headers[0];
-  cols.qa = findCol(headers, [/^qa$/i, /qa/i]);
-  cols.status = findCol(headers, [/web\s*status/i, /status/i]);
-  cols.jira = findCol(headers, [/jira/i]);
-  cols.reason = findCol(headers, [/reason/i, /remark/i, /note/i]);
+  var res = Papa.parse(csvText, { skipEmptyLines: true });
+  var grid = res.data;
 
-  allRows = res.data.filter(function (r) { return norm(r[cols.feature]); })
-    .map(function (r) {
-      return {
-        feature: norm(r[cols.feature]),
-        qa: cols.qa ? norm(r[cols.qa]) : "",
-        rawStatus: cols.status ? norm(r[cols.status]) : "",
-        status: statusOf(cols.status ? r[cols.status] : ""),
-        jira: cols.jira ? norm(r[cols.jira]) : "",
-        reason: cols.reason ? norm(r[cols.reason]) : ""
-      };
+  // Find the header row (contains "Feature")
+  var hIdx = -1;
+  for (var i = 0; i < Math.min(grid.length, 5); i++) {
+    if (grid[i].some(function (c) { return /feature/i.test(norm(c)); })) { hIdx = i; break; }
+  }
+  if (hIdx === -1) hIdx = 0;
+
+  // Preamble rows above the header: run title + Jira filter link
+  var runTitle = "", filterUrl = "";
+  for (var r = 0; r < hIdx; r++) {
+    grid[r].forEach(function (cell) {
+      var c = norm(cell);
+      if (!c) return;
+      var m = c.match(/https?:\/\/[^\s"']+/);
+      if (m) { filterUrl = m[0]; return; }
+      if (!runTitle) runTitle = c;
     });
+  }
+  if (runTitle) document.getElementById("title").textContent = runTitle;
+  var jl = document.getElementById("jiralink");
+  if (filterUrl) { jl.href = filterUrl; jl.style.display = "inline-flex"; }
+  else { jl.style.display = "none"; }
 
-  if (updatedText) document.getElementById("updated").textContent = updatedText;
-  render();
-}
+  var headers = grid[hIdx].map(norm);
+  var cFeature = findCol(headers, [/feature/i]);
+  var cTeam = findCol(headers, [/team/i]);
+  var cQa = findCol(headers, [/^qa$/i, /qa/i]);
+  var cStatus = findCol(headers, [/foodhub\s*web(?!.*app)/i, /web\s*status/i, /^web$/i, /status/i], /app/i);
+  var cApp = findCol(headers, [/app\s*status/i]);
+  var cJira = findCol(headers, [/jira/i]);
+  var cReason = findCol(headers, [/reason/i, /remark/i, /note/i]);
 
-function render() {
-  var q = document.getElementById("search").value.toLowerCase();
-  var f = document.getElementById("statusFilter").value;
-
-  var rows = allRows.filter(function (r) {
-    if (f && r.status !== f) return false;
-    if (!q) return true;
-    return (r.feature + " " + r.qa + " " + r.jira + " " + r.reason).toLowerCase().indexOf(q) !== -1;
-  });
-
-  var total = allRows.length;
-  var pass = 0, fail = 0, blocked = 0;
-  allRows.forEach(function (r) {
-    if (r.status === "Pass") pass++;
-    else if (r.status === "Fail") fail++;
-    else if (r.status === "Blocked") blocked++;
-  });
-  var remaining = total - pass - fail - blocked;
-
-  var bar = document.getElementById("bar");
-  if (total) {
-    bar.innerHTML =
-      '<div class="p" style="width:' + (pass / total * 100) + '%"></div>' +
-      '<div class="f" style="width:' + ((fail + blocked) / total * 100) + '%"></div>';
+  allRows = [];
+  for (var k = hIdx + 1; k < grid.length; k++) {
+    var row = grid[k];
+    var feat = cFeature >= 0 ? norm(row[cFeature]) : "";
+    if (!feat) continue;
+    allRows.push({
+      sno: k,
+      feature: feat,
+      team: cTeam >= 0 ? norm(row[cTeam]) : "",
+      qa: cQa >= 0 ? norm(row[cQa]) : "",
+      status: statusOf(cStatus >= 0 ? row[cStatus] : ""),
+      app: statusOf(cApp >= 0 ? row[cApp] : ""),
+      appRaw: cApp >= 0 ? norm(row[cApp]) : "",
+      jira: cJira >= 0 ? norm(row[cJira]) : "",
+      reason: cReason >= 0 ? norm(row[cReason]) : ""
+    });
   }
 
-  document.getElementById("summary").innerHTML = total
-    ? '<span class="g">' + pass + " passed</span> · " +
-      '<span class="r">' + (fail + blocked) + " failed / blocked</span> · " +
-      remaining + " remaining — " + total + " total" +
-      (rows.length !== total ? " (showing " + rows.length + ")" : "")
-    : "No data loaded.";
+  if (updatedText) document.getElementById("updated").textContent = updatedText;
+  buildFilters();
+  render(true);
+}
 
-  var tbody = document.getElementById("tbody");
+function buildFilters() {
+  var teams = {}, qas = {};
+  allRows.forEach(function (r) {
+    if (r.team) teams[r.team] = 1;
+    if (r.qa) r.qa.split("/").forEach(function (q) { q = norm(q); if (q && q.toLowerCase() !== "na") qas[q.charAt(0).toUpperCase() + q.slice(1).toLowerCase()] = 1; });
+  });
+  fillSelect("teamFilter", Object.keys(teams).sort(), "All teams");
+  fillSelect("qaFilter", Object.keys(qas).sort(), "All QA");
+}
+
+function fillSelect(id, items, label) {
+  var sel = document.getElementById(id);
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">' + label + "</option>";
+  items.forEach(function (t) {
+    var o = document.createElement("option");
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
+  });
+  sel.value = cur;
+}
+
+function counts() {
+  var c = { Pass: 0, Fail: 0, Blocked: 0, NA: 0, Remaining: 0 };
+  allRows.forEach(function (r) { c[r.status]++; });
+  return c;
+}
+
+function render(animate) {
+  var q = document.getElementById("search").value.toLowerCase();
+  var team = document.getElementById("teamFilter").value;
+  var qa = document.getElementById("qaFilter").value.toLowerCase();
+
+  var rows = allRows.filter(function (r) {
+    if (activeStatus && r.status !== activeStatus) return false;
+    if (team && r.team !== team) return false;
+    if (qa && r.qa.toLowerCase().indexOf(qa) === -1) return false;
+    if (q && (r.feature + " " + r.qa + " " + r.team + " " + r.jira + " " + r.reason).toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+
+  rows.sort(function (a, b) {
+    var x = a[sortKey], y = b[sortKey];
+    if (sortKey === "sno") return (x - y) * sortDir;
+    x = (x || "").toString().toLowerCase(); y = (y || "").toString().toLowerCase();
+    if (x < y) return -1 * sortDir;
+    if (x > y) return 1 * sortDir;
+    return (a.sno - b.sno);
+  });
+
+  var c = counts();
+  var total = allRows.length;
+  var tested = c.Pass + c.Fail + c.Blocked;
+  var remaining = c.Remaining + c.NA;
+
+  // Progress bar
+  var bar = document.getElementById("bar");
+  var run = function () {
+    bar.children[0].style.width = (total ? c.Pass / total * 100 : 0) + "%";
+    bar.children[1].style.width = (total ? c.Fail / total * 100 : 0) + "%";
+    bar.children[2].style.width = (total ? c.Blocked / total * 100 : 0) + "%";
+  };
+  animate ? requestAnimationFrame(run) : run();
+
+  // Pass-rate ring
+  var rate = tested ? Math.round(c.Pass / tested * 100) : 0;
+  document.getElementById("ringpct").textContent = total ? rate + "%" : "–";
+  var circ = 169.6;
+  var setRing = function () {
+    document.querySelector(".ring .fg").style.strokeDashoffset = circ - (circ * rate / 100);
+  };
+  animate ? requestAnimationFrame(setRing) : setRing();
+
+  // Chips
+  var chipbox = document.getElementById("chips");
+  chipbox.innerHTML = "";
+  STATUSES.forEach(function (s) {
+    var b = document.createElement("button");
+    b.className = "chip " + s.toLowerCase() + (activeStatus === s ? " on" : "");
+    b.textContent = (s === "Remaining" ? "Remaining" : s === "Pass" ? "Passed" : s === "Fail" ? "Failed" : s) + " " + c[s];
+    b.onclick = function () { activeStatus = (activeStatus === s ? "" : s); render(false); };
+    chipbox.appendChild(b);
+  });
+
+  // Sort indicators
+  document.querySelectorAll("th").forEach(function (th) {
+    th.querySelector(".dir").textContent = th.dataset.k === sortKey ? (sortDir === 1 ? "▲" : "▼") : "";
+  });
+
+  // Table
   var html = "";
   rows.forEach(function (r) {
-    var pillClass = r.status.toLowerCase();
-    var pillText = r.status === "Remaining" ? "Remaining" : (r.rawStatus || r.status);
-    if (r.status === "Pass") pillText = "Pass";
-    if (r.status === "Fail") pillText = "Fail";
-    if (r.status === "Blocked") pillText = "Blocked";
-    if (r.status === "NA") pillText = "NA";
-    html += '<tr class="' + (r.reason ? "has-reason" : "") + '" onclick="this.classList.toggle(\'open\')">' +
+    var bad = (r.status === "Fail" || r.status === "Blocked") ? " bad" : "";
+    html += '<tr class="' + (r.reason ? "has-reason" : "") + bad + '" onclick="this.classList.toggle(\'open\')">' +
       "<td>" + esc(r.feature) +
-      (r.reason ? ' <span class="hint">● note</span><div class="reason">' + esc(r.reason) + "</div>" : "") +
+      (r.reason ? ' <span class="hint">&#9679; note</span><div class="reason">' + esc(r.reason) + "</div>" : "") +
       "</td>" +
-      '<td class="qa-col">' + (esc(r.qa) || '<span class="dash">—</span>') + "</td>" +
-      '<td><span class="pill ' + pillClass + '">' + esc(pillText) + "</span></td>" +
+      '<td class="hide-m">' + (r.team ? '<span class="teamtag">' + esc(r.team) + "</span>" : '<span class="dash">—</span>') + "</td>" +
+      "<td>" + (esc(r.qa) || '<span class="dash">—</span>') + "</td>" +
+      '<td><span class="pill ' + r.status.toLowerCase() + '">' + r.status + "</span>" +
+      (r.app === "Fail" ? '<span class="apptag">App: Fail</span>' : "") + "</td>" +
       "<td>" + jiraCell(r.jira) + "</td></tr>";
   });
-  tbody.innerHTML = html;
+  document.getElementById("tbody").innerHTML = html;
 
   var msg = document.getElementById("msg");
   msg.style.display = rows.length ? "none" : "block";
-  msg.textContent = total ? "No rows match your search or filter." : "";
+  msg.textContent = total ? "No rows match your filters." : "";
+
+  var sub = total
+    ? c.Pass + " passed · " + (c.Fail + c.Blocked) + " failed / blocked · " + remaining + " remaining — " + total + " total" +
+      (rows.length !== total ? " (showing " + rows.length + ")" : "")
+    : "";
+  var upd = document.getElementById("updated");
+  if (!upd.dataset.base) upd.dataset.base = upd.textContent;
+  upd.textContent = sub + (upd.dataset.base ? " · " + upd.dataset.base : "");
 }
 
-document.getElementById("search").addEventListener("input", render);
-document.getElementById("statusFilter").addEventListener("change", render);
+document.getElementById("search").addEventListener("input", function () { render(false); });
+document.getElementById("teamFilter").addEventListener("change", function () { render(false); });
+document.getElementById("qaFilter").addEventListener("change", function () { render(false); });
+document.querySelectorAll("th").forEach(function (th) {
+  th.addEventListener("click", function () {
+    var k = th.dataset.k;
+    if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = 1; }
+    render(false);
+  });
+});
 
 document.getElementById("filepick").addEventListener("change", function (e) {
   var file = e.target.files[0];
   if (!file) return;
   var reader = new FileReader();
-  reader.onload = function () { load(reader.result, "Local preview: " + file.name); };
+  reader.onload = function () {
+    document.getElementById("updated").dataset.base = "Local preview: " + file.name;
+    load(reader.result, "Local preview: " + file.name);
+  };
   reader.readAsText(file);
 });
 
@@ -252,9 +407,8 @@ fetch("data.csv?v=" + Date.now())
     });
   })
   .catch(function () {
-    document.getElementById("summary").textContent =
+    document.getElementById("updated").textContent =
       "Couldn't load data.csv — make sure a file named data.csv is in the same folder, or preview a local CSV below.";
-    document.getElementById("msg").style.display = "block";
   });
 </script>
 </body>

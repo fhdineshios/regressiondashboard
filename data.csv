@@ -1,5 +1,5 @@
-S.No,Feature,Team,QA,"WEB Status
-Preprod",Foodhub App status,Jira ID,Status,Reason
+,Regression 12.7,JIRA filter - https://touch2success.atlassian.net/issues?filter=-2&jql=type%20IN%20(Defect%2C%20%22Defect%20Subtask%22%2C%20Bug)%20AND%20created%20%3E%3D%20%222026-01-01%22%20AND%20created%20%3C%3D%20%222026-09-02%22%0AORDER%20BY%20created%20DESC,,,,,,
+S.No,Feature,Team,QA,Foodhub Web,Foodhub App status,Jira ID,Status,Reason
 1,"Magic links in Zoho mailbox, Outlook mailbox, Gmail box",NA,,,,,,
 2,Guest User - Order flow,THOR,,,,,,
 3,Phone Number i18n,CAPT,Agila,pass,,,,
