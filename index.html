@@ -6,90 +6,130 @@
 <title>Regression progress</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
+  :root {
+    --bg: #f7f7f4; --card: #ffffff; --card2: #f4f4f1;
+    --text: #1f2328; --text2: #5f5e5a; --muted: #8b8b86; --faint: #b4b2a9;
+    --border: #e2e2dd; --border2: #d9d9d4; --track: #e8e8e4;
+    --hover: #f7f9fb; --notebg: #f7f7f4;
+    --green: #1d9e75; --red: #e24b4a; --amber: #ef9f27;
+    --passbg: #e1f5ee; --passfg: #085041; --passbd: #5dcaa5;
+    --failbg: #fcebeb; --failfg: #791f1f; --failbd: #f09595;
+    --blockbg: #faeeda; --blockfg: #633806; --blockbd: #fac775;
+    --neutbg: #f1efe8; --neutfg: #5f5e5a;
+    --badrow: #fdf3f3; --badrowh: #fbeaea;
+    --link: #185fa5; --linkbg: #e6f1fb; --linkbd: #b5d4f4; --linkbgh: #d3e6f8;
+    --allon: #1f2328; --allonfg: #ffffff;
+    --focus: #b5d4f4;
+  }
+  [data-theme="dark"] {
+    --bg: #15171b; --card: #1e2126; --card2: #24272d;
+    --text: #e8e8e5; --text2: #b0afa9; --muted: #8b8b86; --faint: #6a6a66;
+    --border: #33363c; --border2: #3d4046; --track: #2c2f35;
+    --hover: #23272e; --notebg: #191c20;
+    --green: #2ab388; --red: #e05b5a; --amber: #f0a733;
+    --passbg: #0d3b2d; --passfg: #9fe1cb; --passbd: #0f6e56;
+    --failbg: #45191a; --failfg: #f7c1c1; --failbd: #793030;
+    --blockbg: #3f2c10; --blockfg: #fac775; --blockbd: #7a5416;
+    --neutbg: #2a2d33; --neutfg: #b0afa9;
+    --badrow: #291b1c; --badrowh: #322022;
+    --link: #85b7eb; --linkbg: #12283d; --linkbd: #1d4a73; --linkbgh: #17324c;
+    --allon: #e8e8e5; --allonfg: #15171b;
+    --focus: #1d4a73;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #f7f7f4; color: #1f2328; line-height: 1.5;
-    padding: 28px 16px 64px;
+    background: var(--bg); color: var(--text); line-height: 1.5;
+    padding: 28px 16px 64px; transition: background .25s, color .25s;
   }
-  .wrap { max-width: 960px; margin: 0 auto; }
+  .wrap { max-width: 1000px; margin: 0 auto; }
 
   .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
   h1 { font-size: 21px; font-weight: 650; }
-  .sub { font-size: 12.5px; color: #8b8b86; margin-top: 2px; }
+  .sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
   .jirabtn {
     display: inline-flex; align-items: center; gap: 6px;
-    font-size: 13px; font-weight: 500; color: #185fa5;
-    background: #e6f1fb; border: 1px solid #b5d4f4; border-radius: 8px;
-    padding: 7px 14px; text-decoration: none; margin-top: 8px;
-    transition: background .15s;
+    font-size: 13px; font-weight: 500; color: var(--link);
+    background: var(--linkbg); border: 1px solid var(--linkbd); border-radius: 8px;
+    padding: 7px 14px; text-decoration: none; margin-top: 8px; transition: background .15s;
   }
-  .jirabtn:hover { background: #d3e6f8; }
+  .jirabtn:hover { background: var(--linkbgh); }
+  .rightbox { display: flex; align-items: center; gap: 14px; }
   .ringbox { display: flex; align-items: center; gap: 10px; }
-  .ringlabel { font-size: 12px; color: #5f5e5a; line-height: 1.35; }
+  .ringlabel { font-size: 12px; color: var(--text2); line-height: 1.35; }
   .ring circle.fg { transition: stroke-dashoffset 1s ease; }
+  .ring .track { stroke: var(--track); }
+  .ring .fg { stroke: var(--green); }
+  .ring text { fill: var(--text); }
 
-  .bar { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: #e8e8e4; margin-bottom: 14px; }
+  .themebtn {
+    width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+    border: 1px solid var(--border2); background: var(--card);
+    font-size: 17px; line-height: 1; display: flex; align-items: center; justify-content: center;
+    transition: transform .15s, background .15s;
+  }
+  .themebtn:hover { transform: rotate(15deg) scale(1.06); background: var(--card2); }
+
+  .bar { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: var(--track); margin-bottom: 14px; }
   .bar div { width: 0; transition: width .8s ease; }
-  .bar .p { background: #1d9e75; }
-  .bar .f { background: #e24b4a; }
-  .bar .b { background: #ef9f27; }
+  .bar .p { background: var(--green); }
+  .bar .f { background: var(--red); }
+  .bar .b { background: var(--amber); }
 
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
   .chip {
     font: inherit; font-size: 13px; padding: 5px 14px; border-radius: 16px; cursor: pointer;
-    background: #fff; color: #5f5e5a; border: 1px solid #d9d9d4; transition: all .15s;
+    background: var(--card); color: var(--text2); border: 1px solid var(--border2); transition: all .15s;
   }
-  .chip:hover { border-color: #b4b2a9; }
-  .chip.pass.on { background: #e1f5ee; color: #085041; border-color: #5dcaa5; font-weight: 600; }
-  .chip.fail.on { background: #fcebeb; color: #791f1f; border-color: #f09595; font-weight: 600; }
-  .chip.blocked.on { background: #faeeda; color: #633806; border-color: #fac775; font-weight: 600; }
-  .chip.na.on, .chip.remaining.on { background: #ececea; color: #444441; border-color: #b4b2a9; font-weight: 600; }
+  .chip:hover { border-color: var(--faint); }
+  .chip.all.on { background: var(--allon); color: var(--allonfg); border-color: var(--allon); font-weight: 600; }
+  .chip.pass.on { background: var(--passbg); color: var(--passfg); border-color: var(--passbd); font-weight: 600; }
+  .chip.fail.on { background: var(--failbg); color: var(--failfg); border-color: var(--failbd); font-weight: 600; }
+  .chip.blocked.on { background: var(--blockbg); color: var(--blockfg); border-color: var(--blockbd); font-weight: 600; }
+  .chip.na.on, .chip.remaining.on { background: var(--neutbg); color: var(--text); border-color: var(--faint); font-weight: 600; }
 
   .controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
   input[type="search"], select {
     font: inherit; font-size: 14px; padding: 8px 12px;
-    border: 1px solid #d9d9d4; border-radius: 8px; background: #fff; color: inherit;
+    border: 1px solid var(--border2); border-radius: 8px; background: var(--card); color: var(--text);
   }
   input[type="search"] { flex: 1; min-width: 170px; }
-  input[type="search"]:focus, select:focus { outline: 2px solid #b5d4f4; border-color: #378add; }
+  input[type="search"]:focus, select:focus { outline: 2px solid var(--focus); }
 
-  .tablebox { border: 1px solid #e2e2dd; border-radius: 12px; overflow: hidden; background: #fff; }
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .tablebox { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; table-layout: fixed; }
   th {
-    text-align: left; padding: 10px 12px; background: #f4f4f1; color: #5f5e5a;
+    text-align: left; padding: 10px 12px; background: var(--card2); color: var(--text2);
     font-weight: 600; font-size: 12.5px; cursor: pointer; user-select: none; white-space: nowrap;
   }
-  th:hover { color: #1f2328; }
+  th:hover { color: var(--text); }
   th .dir { font-size: 10px; }
-  td { padding: 9px 12px; border-top: 1px solid #eeeeea; vertical-align: top; }
+  td { padding: 9px 12px; border-top: 1px solid var(--border); vertical-align: top; overflow-wrap: break-word; }
   tbody tr { transition: background .12s; }
-  tbody tr:hover { background: #f7f9fb; }
-  tr.bad { background: #fdf3f3; }
-  tr.bad:hover { background: #fbeaea; }
-  tr.has-reason td:first-child { cursor: pointer; }
-  .teamtag { display: inline-block; font-size: 11px; background: #f1efe8; color: #5f5e5a; padding: 2px 8px; border-radius: 8px; }
+  tbody tr:hover { background: var(--hover); }
+  tr.bad { background: var(--badrow); }
+  tr.bad:hover { background: var(--badrowh); }
+  tbody tr { cursor: default; }
+  tr.has-com { cursor: pointer; }
+  .teamtag { display: inline-block; font-size: 11px; background: var(--neutbg); color: var(--neutfg); padding: 2px 8px; border-radius: 8px; }
   .pill { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: 10px; white-space: nowrap; }
-  .pill.pass { background: #e1f5ee; color: #085041; }
-  .pill.fail { background: #fcebeb; color: #791f1f; }
-  .pill.blocked { background: #faeeda; color: #633806; }
-  .pill.na { background: #f1efe8; color: #5f5e5a; }
-  .pill.remaining { background: #f1efe8; color: #888780; }
-  .apptag { display: inline-block; font-size: 10.5px; margin-left: 4px; padding: 1px 7px; border-radius: 8px; background: #fcebeb; color: #791f1f; }
-  a { color: #185fa5; text-decoration: none; }
+  .pill.pass { background: var(--passbg); color: var(--passfg); }
+  .pill.fail { background: var(--failbg); color: var(--failfg); }
+  .pill.blocked { background: var(--blockbg); color: var(--blockfg); }
+  .pill.na, .pill.remaining { background: var(--neutbg); color: var(--neutfg); }
+  .apptag { display: inline-block; font-size: 10.5px; margin-left: 4px; padding: 1px 7px; border-radius: 8px; background: var(--failbg); color: var(--failfg); }
+  a { color: var(--link); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  .dash { color: #b4b2a9; }
-  .reason { font-size: 12.5px; color: #6b6a65; margin-top: 5px; display: none; white-space: pre-wrap; background: #f7f7f4; border-radius: 6px; padding: 8px 10px; }
-  tr.open .reason { display: block; }
-  .hint { font-size: 11px; color: #b4b2a9; }
-  .footer { margin-top: 16px; font-size: 12px; color: #8b8b86; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-  .footer label { cursor: pointer; color: #185fa5; }
+  .dash { color: var(--faint); }
+  .com { color: var(--text2); font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  tr.open .com { white-space: pre-wrap; overflow: visible; }
+  .footer { margin-top: 16px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer label { cursor: pointer; color: var(--link); }
   #filepick { display: none; }
-  #msg { padding: 24px; text-align: center; color: #8b8b86; font-size: 14px; }
-  @media (max-width: 640px) {
+  #msg { padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+  @media (max-width: 680px) {
     th.hide-m, td.hide-m { display: none; }
     body { padding: 18px 10px 48px; }
-    .top { align-items: flex-start; }
   }
 </style>
 </head>
@@ -103,15 +143,18 @@
         Open Jira defect filter <span aria-hidden="true">&#8599;</span>
       </a>
     </div>
-    <div class="ringbox">
-      <svg class="ring" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pass rate">
-        <circle cx="32" cy="32" r="27" fill="none" stroke="#e8e8e4" stroke-width="7"/>
-        <circle class="fg" cx="32" cy="32" r="27" fill="none" stroke="#1d9e75" stroke-width="7"
-          stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"
-          transform="rotate(-90 32 32)"/>
-        <text id="ringpct" x="32" y="37" text-anchor="middle" font-size="14" font-weight="600" fill="#1f2328">–</text>
-      </svg>
-      <div class="ringlabel">pass rate<br>of tested</div>
+    <div class="rightbox">
+      <div class="ringbox">
+        <svg class="ring" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pass rate">
+          <circle class="track" cx="32" cy="32" r="27" fill="none" stroke-width="7"/>
+          <circle class="fg" cx="32" cy="32" r="27" fill="none" stroke-width="7"
+            stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="169.6"
+            transform="rotate(-90 32 32)"/>
+          <text id="ringpct" x="32" y="37" text-anchor="middle" font-size="14" font-weight="600">–</text>
+        </svg>
+        <div class="ringlabel">pass rate<br>of tested</div>
+      </div>
+      <button class="themebtn" id="themebtn" aria-label="Toggle dark mode" title="Toggle dark / light theme">&#9789;</button>
     </div>
   </div>
 
@@ -120,7 +163,7 @@
   <div class="chips" id="chips"></div>
 
   <div class="controls">
-    <input type="search" id="search" placeholder="Search features, QA, Jira...">
+    <input type="search" id="search" placeholder="Search features, QA, Jira, comments...">
     <select id="teamFilter"><option value="">All teams</option></select>
     <select id="qaFilter"><option value="">All QA</option></select>
   </div>
@@ -129,11 +172,12 @@
     <table>
       <thead>
         <tr>
-          <th data-k="feature" style="width:38%">Feature <span class="dir"></span></th>
-          <th data-k="team" class="hide-m" style="width:11%">Team <span class="dir"></span></th>
-          <th data-k="qa" style="width:15%">QA <span class="dir"></span></th>
-          <th data-k="status" style="width:15%">Status <span class="dir"></span></th>
-          <th data-k="jira" style="width:21%">Jira <span class="dir"></span></th>
+          <th data-k="feature" style="width:30%">Feature <span class="dir"></span></th>
+          <th data-k="team" class="hide-m" style="width:10%">Team <span class="dir"></span></th>
+          <th data-k="qa" style="width:13%">QA <span class="dir"></span></th>
+          <th data-k="status" style="width:13%">Status <span class="dir"></span></th>
+          <th data-k="jira" style="width:16%">Jira <span class="dir"></span></th>
+          <th data-k="comments" style="width:18%">Comments <span class="dir"></span></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -142,17 +186,30 @@
   </div>
 
   <div class="footer">
-    <span>Click a status chip to filter · click a feature with a ● note to expand it</span>
+    <span>Chips filter by status · click a row with a comment to expand it · headers sort</span>
     <label>Preview a local CSV<input type="file" id="filepick" accept=".csv"></label>
   </div>
 </div>
 
 <script>
 var JIRA_BASE = "https://touch2success.atlassian.net/browse/";
-var STATUSES = ["Pass", "Fail", "Blocked", "NA", "Remaining"];
+var STATUSES = ["All", "Pass", "Fail", "Blocked", "NA", "Remaining"];
 var allRows = [];
-var activeStatus = "";
+var activeStatus = "All";
 var sortKey = "sno", sortDir = 1;
+
+// Theme: saved choice wins, otherwise follow system
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("theme"); } catch (e) {}
+  var dark = saved ? saved === "dark" : window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (dark) document.documentElement.setAttribute("data-theme", "dark");
+})();
+function themeIcon() {
+  var dark = document.documentElement.getAttribute("data-theme") === "dark";
+  document.getElementById("themebtn").innerHTML = dark ? "&#9788;" : "&#9789;";
+}
+document.addEventListener("DOMContentLoaded", themeIcon);
 
 function norm(v) { return (v || "").toString().trim(); }
 
@@ -179,9 +236,9 @@ function jiraCell(raw) {
     var p = parts[i];
     if (/^https?:\/\//i.test(p)) {
       var id = p.split("/").pop();
-      out.push('<a href="' + esc(p) + '" target="_blank" rel="noopener">' + esc(id) + ' &#8599;</a>');
+      out.push('<a href="' + esc(p) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + esc(id) + ' &#8599;</a>');
     } else if (/^[A-Za-z][A-Za-z0-9]+-\d+$/.test(p)) {
-      out.push('<a href="' + JIRA_BASE + p + '" target="_blank" rel="noopener">' + esc(p) + ' &#8599;</a>');
+      out.push('<a href="' + JIRA_BASE + p + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">' + esc(p) + ' &#8599;</a>');
     } else {
       out.push(esc(p));
     }
@@ -202,14 +259,12 @@ function load(csvText, updatedText) {
   var res = Papa.parse(csvText, { skipEmptyLines: true });
   var grid = res.data;
 
-  // Find the header row (contains "Feature")
   var hIdx = -1;
   for (var i = 0; i < Math.min(grid.length, 5); i++) {
     if (grid[i].some(function (c) { return /feature/i.test(norm(c)); })) { hIdx = i; break; }
   }
   if (hIdx === -1) hIdx = 0;
 
-  // Preamble rows above the header: run title + Jira filter link
   var runTitle = "", filterUrl = "";
   for (var r = 0; r < hIdx; r++) {
     grid[r].forEach(function (cell) {
@@ -232,6 +287,8 @@ function load(csvText, updatedText) {
   var cStatus = findCol(headers, [/foodhub\s*web(?!.*app)/i, /web\s*status/i, /^web$/i, /status/i], /app/i);
   var cApp = findCol(headers, [/app\s*status/i]);
   var cJira = findCol(headers, [/jira/i]);
+  var cComment = findCol(headers, [/comment/i, /^status$/i]);
+  if (cComment === cStatus) cComment = -1;
   var cReason = findCol(headers, [/reason/i, /remark/i, /note/i]);
 
   allRows = [];
@@ -239,6 +296,9 @@ function load(csvText, updatedText) {
     var row = grid[k];
     var feat = cFeature >= 0 ? norm(row[cFeature]) : "";
     if (!feat) continue;
+    var comBits = [];
+    if (cComment >= 0 && norm(row[cComment])) comBits.push(norm(row[cComment]));
+    if (cReason >= 0 && norm(row[cReason])) comBits.push(norm(row[cReason]));
     allRows.push({
       sno: k,
       feature: feat,
@@ -246,13 +306,15 @@ function load(csvText, updatedText) {
       qa: cQa >= 0 ? norm(row[cQa]) : "",
       status: statusOf(cStatus >= 0 ? row[cStatus] : ""),
       app: statusOf(cApp >= 0 ? row[cApp] : ""),
-      appRaw: cApp >= 0 ? norm(row[cApp]) : "",
       jira: cJira >= 0 ? norm(row[cJira]) : "",
-      reason: cReason >= 0 ? norm(row[cReason]) : ""
+      comments: comBits.join("\n")
     });
   }
 
-  if (updatedText) document.getElementById("updated").textContent = updatedText;
+  if (updatedText) {
+    var upd = document.getElementById("updated");
+    upd.dataset.base = updatedText;
+  }
   buildFilters();
   render(true);
 }
@@ -261,7 +323,10 @@ function buildFilters() {
   var teams = {}, qas = {};
   allRows.forEach(function (r) {
     if (r.team) teams[r.team] = 1;
-    if (r.qa) r.qa.split("/").forEach(function (q) { q = norm(q); if (q && q.toLowerCase() !== "na") qas[q.charAt(0).toUpperCase() + q.slice(1).toLowerCase()] = 1; });
+    if (r.qa) r.qa.split("/").forEach(function (q) {
+      q = norm(q);
+      if (q && q.toLowerCase() !== "na") qas[q.charAt(0).toUpperCase() + q.slice(1).toLowerCase()] = 1;
+    });
   });
   fillSelect("teamFilter", Object.keys(teams).sort(), "All teams");
   fillSelect("qaFilter", Object.keys(qas).sort(), "All QA");
@@ -282,6 +347,7 @@ function fillSelect(id, items, label) {
 function counts() {
   var c = { Pass: 0, Fail: 0, Blocked: 0, NA: 0, Remaining: 0 };
   allRows.forEach(function (r) { c[r.status]++; });
+  c.All = allRows.length;
   return c;
 }
 
@@ -291,10 +357,10 @@ function render(animate) {
   var qa = document.getElementById("qaFilter").value.toLowerCase();
 
   var rows = allRows.filter(function (r) {
-    if (activeStatus && r.status !== activeStatus) return false;
+    if (activeStatus !== "All" && r.status !== activeStatus) return false;
     if (team && r.team !== team) return false;
     if (qa && r.qa.toLowerCase().indexOf(qa) === -1) return false;
-    if (q && (r.feature + " " + r.qa + " " + r.team + " " + r.jira + " " + r.reason).toLowerCase().indexOf(q) === -1) return false;
+    if (q && (r.feature + " " + r.qa + " " + r.team + " " + r.jira + " " + r.comments).toLowerCase().indexOf(q) === -1) return false;
     return true;
   });
 
@@ -304,7 +370,7 @@ function render(animate) {
     x = (x || "").toString().toLowerCase(); y = (y || "").toString().toLowerCase();
     if (x < y) return -1 * sortDir;
     if (x > y) return 1 * sortDir;
-    return (a.sno - b.sno);
+    return a.sno - b.sno;
   });
 
   var c = counts();
@@ -312,7 +378,6 @@ function render(animate) {
   var tested = c.Pass + c.Fail + c.Blocked;
   var remaining = c.Remaining + c.NA;
 
-  // Progress bar
   var bar = document.getElementById("bar");
   var run = function () {
     bar.children[0].style.width = (total ? c.Pass / total * 100 : 0) + "%";
@@ -321,7 +386,6 @@ function render(animate) {
   };
   animate ? requestAnimationFrame(run) : run();
 
-  // Pass-rate ring
   var rate = tested ? Math.round(c.Pass / tested * 100) : 0;
   document.getElementById("ringpct").textContent = total ? rate + "%" : "–";
   var circ = 169.6;
@@ -330,35 +394,34 @@ function render(animate) {
   };
   animate ? requestAnimationFrame(setRing) : setRing();
 
-  // Chips
   var chipbox = document.getElementById("chips");
   chipbox.innerHTML = "";
   STATUSES.forEach(function (s) {
     var b = document.createElement("button");
     b.className = "chip " + s.toLowerCase() + (activeStatus === s ? " on" : "");
-    b.textContent = (s === "Remaining" ? "Remaining" : s === "Pass" ? "Passed" : s === "Fail" ? "Failed" : s) + " " + c[s];
-    b.onclick = function () { activeStatus = (activeStatus === s ? "" : s); render(false); };
+    var label = s === "All" ? "All" : s === "Pass" ? "Passed" : s === "Fail" ? "Failed" : s;
+    b.textContent = label + " " + c[s];
+    b.onclick = function () { activeStatus = s; render(false); };
     chipbox.appendChild(b);
   });
 
-  // Sort indicators
   document.querySelectorAll("th").forEach(function (th) {
     th.querySelector(".dir").textContent = th.dataset.k === sortKey ? (sortDir === 1 ? "▲" : "▼") : "";
   });
 
-  // Table
   var html = "";
   rows.forEach(function (r) {
     var bad = (r.status === "Fail" || r.status === "Blocked") ? " bad" : "";
-    html += '<tr class="' + (r.reason ? "has-reason" : "") + bad + '" onclick="this.classList.toggle(\'open\')">' +
-      "<td>" + esc(r.feature) +
-      (r.reason ? ' <span class="hint">&#9679; note</span><div class="reason">' + esc(r.reason) + "</div>" : "") +
-      "</td>" +
+    var hasCom = r.comments ? " has-com" : "";
+    html += '<tr class="' + hasCom + bad + '"' + (r.comments ? " onclick=\"this.classList.toggle('open')\"" : "") + ">" +
+      "<td>" + esc(r.feature) + "</td>" +
       '<td class="hide-m">' + (r.team ? '<span class="teamtag">' + esc(r.team) + "</span>" : '<span class="dash">—</span>') + "</td>" +
       "<td>" + (esc(r.qa) || '<span class="dash">—</span>') + "</td>" +
       '<td><span class="pill ' + r.status.toLowerCase() + '">' + r.status + "</span>" +
       (r.app === "Fail" ? '<span class="apptag">App: Fail</span>' : "") + "</td>" +
-      "<td>" + jiraCell(r.jira) + "</td></tr>";
+      "<td>" + jiraCell(r.jira) + "</td>" +
+      "<td>" + (r.comments ? '<div class="com">' + esc(r.comments) + "</div>" : '<span class="dash">—</span>') + "</td>" +
+      "</tr>";
   });
   document.getElementById("tbody").innerHTML = html;
 
@@ -366,14 +429,23 @@ function render(animate) {
   msg.style.display = rows.length ? "none" : "block";
   msg.textContent = total ? "No rows match your filters." : "";
 
+  var upd = document.getElementById("updated");
+  var base = upd.dataset.base || "";
   var sub = total
     ? c.Pass + " passed · " + (c.Fail + c.Blocked) + " failed / blocked · " + remaining + " remaining — " + total + " total" +
       (rows.length !== total ? " (showing " + rows.length + ")" : "")
     : "";
-  var upd = document.getElementById("updated");
-  if (!upd.dataset.base) upd.dataset.base = upd.textContent;
-  upd.textContent = sub + (upd.dataset.base ? " · " + upd.dataset.base : "");
+  upd.textContent = sub + (base ? " · " + base : "");
 }
+
+document.getElementById("themebtn").addEventListener("click", function () {
+  var root = document.documentElement;
+  var dark = root.getAttribute("data-theme") === "dark";
+  if (dark) root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", "dark");
+  try { localStorage.setItem("theme", dark ? "light" : "dark"); } catch (e) {}
+  themeIcon();
+});
 
 document.getElementById("search").addEventListener("input", function () { render(false); });
 document.getElementById("teamFilter").addEventListener("change", function () { render(false); });
@@ -390,10 +462,7 @@ document.getElementById("filepick").addEventListener("change", function (e) {
   var file = e.target.files[0];
   if (!file) return;
   var reader = new FileReader();
-  reader.onload = function () {
-    document.getElementById("updated").dataset.base = "Local preview: " + file.name;
-    load(reader.result, "Local preview: " + file.name);
-  };
+  reader.onload = function () { load(reader.result, "Local preview: " + file.name); };
   reader.readAsText(file);
 });
 
