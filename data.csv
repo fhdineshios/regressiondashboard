@@ -1,0 +1,58 @@
+S.No,Feature,Team,QA,"WEB Status
+Preprod",Foodhub App status,Jira ID,Status,Reason
+1,"Magic links in Zoho mailbox, Outlook mailbox, Gmail box",NA,,,,,,
+2,Guest User - Order flow,THOR,,,,,,
+3,Phone Number i18n,CAPT,Agila,pass,,,,
+4,SEO / Google Search validations,NA,,,,,,
+5,CX,CAPT,Agila,Pass,,,"customer minimum order does not satisfied so task has been created in agent side , agent has approved the order",
+6,Item Instructions / Allergens,CAPT,Yogadarshan,Pass,,,,
+7,Additional Info,CAPT,Yogadarshan,Pass,,,,
+8,Table Booking / Loyalty Points,NA,,,,,,
+9,Event Ordering,NA,,,,,,
+10,Menu (V3.5) Scheduling,THOR,Fayaz,,,,,
+11,Payment Integrations (Stripe / Optomany),THOR,Fayaz/Safi,Pass,,,,
+12,Payments - Cash / New Card / Saved Card / Apple Pay / GPay / PBL / Wallet / Wallet + X,THOR,Fayaz/Safi,Pass,,,,
+13,GDPR,CAPT,pavithra,,,,,
+14,New Address search bar,CAPT,Lakshmi,Pass,,,,
+15,Price transparency,CAPT,Agila,Pass,,COCAPT-12406,,
+16,Coupons / Gifts / BOGO,CAPT,Agila,Pass,,,,"1206282429, 1206274257, 1206283242"
+17,Universal Coupons/Discounts,CAPT,Pavithra,Pass,,,,"1205228741,1205228873,1205231897,1205240102"
+18,Dynamic Prep time / Wait time,CAPT,Pavithra,Fail,,COR-269,,
+19,VAT / TAX in UK US - COHULK-1280,CAPT,Lakshmi,,,,,
+20,MoEngage (FH),CAPT,Lakshmi,Pass,,,,
+21,GIFT Card,CAPT,Agila,Fail,Fail,COCAPT-12417,,
+22,Checkout module,THOR,Fayaz,,,,,
+23,Crashytics,Dev,,,,,,
+24,Order Summary,CAPT,Lakshmi,Pass,,,,
+25,Cookery video,CAPT,Yogadarshan,Pass,,,,
+26,Discount banner update,CAPT,Lakshmi,,,,,
+27,WISMO,CAPT,Pavithra,Fail,,COR-262,,1205235893
+28,Eatappy- marketplace fee,CAPT,Pavithra,Blocked,,,,"Eatappy pre-prod website is not loading , shows 404 error https://preprod-franchise-eatappy.t2sonline.com/"
+29,Dine-in,NA,,,,,,
+30,Price uplift,THOR,,,,,,
+31,New menu changes (Horizontal Bar),ANTMAN,,,,,,
+32,Order Tracking Driver delivery,CAPT,Lakshmi,NA,,,,
+33,Remove timer until accept,CAPT,Lakshmi,Pass,,,,
+34,Guest user order history,THOR,Fayaz,,,,,
+35,Flash sale,THOR,,,,,,
+36,Upselling,CAPT,Lakshmi,Pass,,,,
+37,AFP,NA,,,,,,
+38,5 mile Restriction,NA,Dinesh,NA,NA,,,Currently its Toggle OFF
+39,Trackier,THOR,NA,,,,,
+40,Groceries,CAPT,pavithra,Pass,,,,"1205235893,1205240102"
+41,Instant Checkout (1 to 4),THOR,Fayaz,,,,,
+42,Email Templates,CAPT,Lakshmi,Pass,,,,
+43,Driver Tips,CAPT,yogadarshan,pass,,"https://touch2success.atlassian.net/browse/COCAPT-12404
+https://touch2success.atlassian.net/browse/COCAPT-12403",,Found 2 P3 bugs in native site
+44,Near By Address,THOR,Safi,Pass,,,,
+45,Item Substitution,THOR,Safi,,,,,
+46,National Brands,CAPT,Yogadarshan,not testable in pre-prod,,,,
+47,Flowers2You,NA,,,,,,
+48,Top 10,THOR,,,,,,
+49,Gamefication,THOR,Fayaz/Safi,,,,,
+50,Delivery PIn,THOR,Safi,,,,,
+51,Meal Deal,THOR,Safi,Pass,,,,
+52,Minmum order nudge,THOR,Safi,Pass,,,,
+53,Multi Menu enhancement,THOR,Fayaz,,,,,
+54,Hide Zero Price Label on Modifier Options,THOR,Fayaz,,,,,
+55,Event Ordering with Multi-Menu,THOR,Fayaz,,,,,

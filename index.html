@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regression progress</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #fafaf8; color: #1f2328; line-height: 1.5;
+    padding: 32px 16px 64px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  .updated { font-size: 12px; color: #8b8b86; }
+  .bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; background: #e8e8e4; margin-bottom: 10px; }
+  .bar div { transition: width .4s ease; }
+  .bar .p { background: #1d9e75; }
+  .bar .f { background: #e24b4a; }
+  .summary { font-size: 14px; color: #5f5e5a; margin-bottom: 24px; }
+  .summary .g { color: #0f6e56; font-weight: 600; }
+  .summary .r { color: #a32d2d; font-weight: 600; }
+  .controls { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  input[type="search"], select {
+    font: inherit; font-size: 14px; padding: 8px 12px;
+    border: 1px solid #d9d9d4; border-radius: 8px; background: #fff; color: inherit;
+  }
+  input[type="search"] { flex: 1; min-width: 180px; }
+  input[type="search"]:focus, select:focus { outline: 2px solid #b5d4f4; border-color: #378add; }
+  .tablebox { border: 1px solid #e2e2dd; border-radius: 12px; overflow: hidden; background: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; padding: 10px 12px; background: #f4f4f1; color: #5f5e5a; font-weight: 600; font-size: 12.5px; }
+  td { padding: 9px 12px; border-top: 1px solid #eeeeea; vertical-align: top; }
+  tr.has-reason td:first-child { cursor: pointer; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 10px; border-radius: 10px; white-space: nowrap; }
+  .pill.pass { background: #e1f5ee; color: #085041; }
+  .pill.fail { background: #fcebeb; color: #791f1f; }
+  .pill.blocked { background: #faeeda; color: #633806; }
+  .pill.na { background: #f1efe8; color: #5f5e5a; }
+  .pill.remaining { background: #f1efe8; color: #888780; }
+  a { color: #185fa5; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .dash { color: #b4b2a9; }
+  .reason { font-size: 12.5px; color: #6b6a65; margin-top: 4px; display: none; white-space: pre-wrap; }
+  tr.open .reason { display: block; }
+  .hint { font-size: 11px; color: #b4b2a9; }
+  .footer { margin-top: 16px; font-size: 12px; color: #8b8b86; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .footer label { cursor: pointer; color: #185fa5; }
+  #filepick { display: none; }
+  #msg { padding: 24px; text-align: center; color: #8b8b86; font-size: 14px; }
+  @media (max-width: 600px) {
+    th.qa-col, td.qa-col { display: none; }
+    body { padding: 20px 10px 48px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Regression progress</h1>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div class="bar" id="bar"></div>
+  <div class="summary" id="summary">Loading data.csv...</div>
+
+  <div class="controls">
+    <input type="search" id="search" placeholder="Search features, QA, Jira...">
+    <select id="statusFilter">
+      <option value="">All statuses</option>
+      <option value="Pass">Passed</option>
+      <option value="Fail">Failed</option>
+      <option value="Blocked">Blocked</option>
+      <option value="NA">NA</option>
+      <option value="Remaining">Remaining</option>
+    </select>
+  </div>
+
+  <div class="tablebox">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:46%">Feature</th>
+          <th class="qa-col" style="width:16%">QA</th>
+          <th style="width:16%">Status</th>
+          <th style="width:22%">Jira</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div id="msg" style="display:none"></div>
+  </div>
+
+  <div class="footer">
+    <span>Rows with a note show a small marker — click the feature name to read it.</span>
+    <label>Preview a local CSV<input type="file" id="filepick" accept=".csv"></label>
+  </div>
+</div>
+
+<script>
+var JIRA_BASE = "https://touch2success.atlassian.net/browse/";
+var allRows = [];
+var cols = {};
+
+function norm(v) { return (v || "").toString().trim(); }
+
+function statusOf(raw) {
+  var s = norm(raw).toLowerCase();
+  if (!s) return "Remaining";
+  if (s === "pass" || s === "passed") return "Pass";
+  if (s === "fail" || s === "failed") return "Fail";
+  if (s === "blocked" || s === "block") return "Blocked";
+  if (s === "na" || s === "n/a" || s.indexOf("not testable") !== -1) return "NA";
+  return "Remaining";
+}
+
+function findCol(headers, patterns) {
+  for (var i = 0; i < patterns.length; i++) {
+    for (var j = 0; j < headers.length; j++) {
+      if (patterns[i].test(headers[j])) return headers[j];
+    }
+  }
+  return null;
+}
+
+function jiraCell(raw) {
+  var v = norm(raw);
+  if (!v) return '<span class="dash">—</span>';
+  var parts = v.split(/[\s,\n]+/).filter(Boolean);
+  var out = [];
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i];
+    if (/^https?:\/\//i.test(p)) {
+      var id = p.split("/").pop();
+      out.push('<a href="' + p + '" target="_blank" rel="noopener">' + id + '</a>');
+    } else if (/^[A-Za-z][A-Za-z0-9]+-\d+$/.test(p)) {
+      out.push('<a href="' + JIRA_BASE + p + '" target="_blank" rel="noopener">' + p + '</a>');
+    } else {
+      out.push(p);
+    }
+  }
+  return out.join("<br>");
+}
+
+function esc(s) {
+  return norm(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function load(csvText, updatedText) {
+  var res = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+  var headers = res.meta.fields || [];
+  cols.feature = findCol(headers, [/feature/i]) || headers[1] || headers[0];
+  cols.qa = findCol(headers, [/^qa$/i, /qa/i]);
+  cols.status = findCol(headers, [/web\s*status/i, /status/i]);
+  cols.jira = findCol(headers, [/jira/i]);
+  cols.reason = findCol(headers, [/reason/i, /remark/i, /note/i]);
+
+  allRows = res.data.filter(function (r) { return norm(r[cols.feature]); })
+    .map(function (r) {
+      return {
+        feature: norm(r[cols.feature]),
+        qa: cols.qa ? norm(r[cols.qa]) : "",
+        rawStatus: cols.status ? norm(r[cols.status]) : "",
+        status: statusOf(cols.status ? r[cols.status] : ""),
+        jira: cols.jira ? norm(r[cols.jira]) : "",
+        reason: cols.reason ? norm(r[cols.reason]) : ""
+      };
+    });
+
+  if (updatedText) document.getElementById("updated").textContent = updatedText;
+  render();
+}
+
+function render() {
+  var q = document.getElementById("search").value.toLowerCase();
+  var f = document.getElementById("statusFilter").value;
+
+  var rows = allRows.filter(function (r) {
+    if (f && r.status !== f) return false;
+    if (!q) return true;
+    return (r.feature + " " + r.qa + " " + r.jira + " " + r.reason).toLowerCase().indexOf(q) !== -1;
+  });
+
+  var total = allRows.length;
+  var pass = 0, fail = 0, blocked = 0;
+  allRows.forEach(function (r) {
+    if (r.status === "Pass") pass++;
+    else if (r.status === "Fail") fail++;
+    else if (r.status === "Blocked") blocked++;
+  });
+  var remaining = total - pass - fail - blocked;
+
+  var bar = document.getElementById("bar");
+  if (total) {
+    bar.innerHTML =
+      '<div class="p" style="width:' + (pass / total * 100) + '%"></div>' +
+      '<div class="f" style="width:' + ((fail + blocked) / total * 100) + '%"></div>';
+  }
+
+  document.getElementById("summary").innerHTML = total
+    ? '<span class="g">' + pass + " passed</span> · " +
+      '<span class="r">' + (fail + blocked) + " failed / blocked</span> · " +
+      remaining + " remaining — " + total + " total" +
+      (rows.length !== total ? " (showing " + rows.length + ")" : "")
+    : "No data loaded.";
+
+  var tbody = document.getElementById("tbody");
+  var html = "";
+  rows.forEach(function (r) {
+    var pillClass = r.status.toLowerCase();
+    var pillText = r.status === "Remaining" ? "Remaining" : (r.rawStatus || r.status);
+    if (r.status === "Pass") pillText = "Pass";
+    if (r.status === "Fail") pillText = "Fail";
+    if (r.status === "Blocked") pillText = "Blocked";
+    if (r.status === "NA") pillText = "NA";
+    html += '<tr class="' + (r.reason ? "has-reason" : "") + '" onclick="this.classList.toggle(\'open\')">' +
+      "<td>" + esc(r.feature) +
+      (r.reason ? ' <span class="hint">● note</span><div class="reason">' + esc(r.reason) + "</div>" : "") +
+      "</td>" +
+      '<td class="qa-col">' + (esc(r.qa) || '<span class="dash">—</span>') + "</td>" +
+      '<td><span class="pill ' + pillClass + '">' + esc(pillText) + "</span></td>" +
+      "<td>" + jiraCell(r.jira) + "</td></tr>";
+  });
+  tbody.innerHTML = html;
+
+  var msg = document.getElementById("msg");
+  msg.style.display = rows.length ? "none" : "block";
+  msg.textContent = total ? "No rows match your search or filter." : "";
+}
+
+document.getElementById("search").addEventListener("input", render);
+document.getElementById("statusFilter").addEventListener("change", render);
+
+document.getElementById("filepick").addEventListener("change", function (e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function () { load(reader.result, "Local preview: " + file.name); };
+  reader.readAsText(file);
+});
+
+fetch("data.csv?v=" + Date.now())
+  .then(function (r) {
+    if (!r.ok) throw new Error("not found");
+    var lm = r.headers.get("last-modified");
+    return r.text().then(function (t) {
+      var when = lm ? "Updated " + new Date(lm).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" }) : "";
+      load(t, when);
+    });
+  })
+  .catch(function () {
+    document.getElementById("summary").textContent =
+      "Couldn't load data.csv — make sure a file named data.csv is in the same folder, or preview a local CSV below.";
+    document.getElementById("msg").style.display = "block";
+  });
+</script>
+</body>
+</html>
