@@ -332,6 +332,7 @@
 var JIRA_BASE = "https://touch2success.atlassian.net/browse/";
 var allRows = [];
 var platforms = [];   // [{key, label, col}]
+var overrides = [];   // [{name, key, pct}] module-level manual percentages from the CSV top row
 var state = { search: "", team: "", qa: "", status: "", platform: "all", page: 1, per: 10, sortKey: "sno", sortDir: 1, view: "dashboard" };
 
 (function () {
@@ -389,11 +390,14 @@ function load(csvText, updatedText) {
   if (hIdx === -1) hIdx = 0;
 
   var runTitle = "", filterUrl = "";
+  overrides = [];
   for (var r = 0; r < hIdx; r++) grid[r].forEach(function (cell) {
     var c = norm(cell);
     if (!c) return;
     var m = c.match(/https?:\/\/[^\s"']+/);
     if (m) { filterUrl = m[0]; return; }
+    var ov = c.match(/^(.+?)\s*[-–:]\s*(\d+(?:\.\d+)?)\s*%$/);
+    if (ov) { overrides.push({ name: ov[1].trim(), key: ov[1].toLowerCase().replace(/[^a-z0-9]/g, ""), pct: parseFloat(ov[2]) }); return; }
     if (!runTitle) runTitle = c;
   });
   if (runTitle) document.getElementById("title").textContent = runTitle;
@@ -454,11 +458,16 @@ function load(csvText, updatedText) {
       p[pl.key] = statusOf(row[pl.col]);
       praw[pl.key] = norm(row[pl.col]);
     });
+    var featKey = feat.toLowerCase().replace(/[^a-z0-9]/g, "");
+    var ovr = null;
+    overrides.forEach(function (o) {
+      if (featKey === o.key || featKey.lastIndexOf(o.key, 0) === 0 || o.key.lastIndexOf(featKey, 0) === 0) ovr = o;
+    });
     allRows.push({
       sno: k, feature: feat,
       team: cTeam >= 0 ? norm(row[cTeam]) : "",
       qa: cQa >= 0 ? norm(row[cQa]) : "",
-      p: p, praw: praw,
+      p: p, praw: praw, ovr: ovr,
       jira: cJira >= 0 ? norm(row[cJira]) : "",
       comments: bits.join("\n")
     });
@@ -501,9 +510,13 @@ function rowBad(r) { return rowHas(r, "Fail") || rowHas(r, "Blocked"); }
 
 // Counts of CHECKS (feature x platform) in current scope
 function checkCounts() {
-  var c = { Pass: 0, Fail: 0, Blocked: 0, NA: 0, Remaining: 0, total: 0 };
+  var c = { Pass: 0, Fail: 0, Blocked: 0, NA: 0, Remaining: 0, total: 0, partial: 0 };
   allRows.forEach(function (r) {
-    rowStatuses(r).forEach(function (s) { c[s]++; c.total++; });
+    rowStatuses(r).forEach(function (s) {
+      c[s]++; c.total++;
+      // A module with a manual % contributes that fraction for its untested, applicable checks
+      if (r.ovr && s === "Remaining") c.partial += r.ovr.pct / 100;
+    });
   });
   return c;
 }
@@ -531,6 +544,9 @@ function kpiIcon(kind) {
 }
 
 function statusCellHtml(r) {
+  if (r.ovr && rowStatuses(r).every(function (s) { return s === "Remaining"; })) {
+    return '<span class="pill" style="background:var(--accentbg);color:var(--accent)">' + r.ovr.pct + "% done</span>";
+  }
   if (state.platform !== "all") {
     var s = r.p[state.platform];
     var raw = r.praw[state.platform];
@@ -547,13 +563,13 @@ function statusCellHtml(r) {
 
 function render(animate) {
   var c = checkCounts();
-  var total = c.total;
+  var grand = c.total;
+  var total = grand - c.NA;               // applicable checks: NA excluded from all percentages
   var tested = c.Pass + c.Fail + c.Blocked;
-  var rate = tested ? Math.round(c.Pass / tested * 100) : 0;
-  var rem = c.Remaining + c.NA;
+  var rem = c.Remaining;
 
   document.getElementById("mTotal").textContent = allRows.length;
-  document.getElementById("mTested").textContent = tested + " / " + total + (state.platform === "all" ? " checks" : "");
+  document.getElementById("mTested").textContent = tested + " / " + total + (state.platform === "all" ? " applicable checks" : " applicable");
 
   // Platform tabs
   var tb = document.getElementById("ptabs");
@@ -576,12 +592,14 @@ function render(animate) {
     { key: "Fail", label: "Failed", n: c.Fail, col: cssVar("--red"), bg: cssVar("--failbg") },
     { key: "Blocked", label: "Blocked", n: c.Blocked, col: cssVar("--amber"), bg: cssVar("--blockbg") },
     { key: "Remaining", label: "Remaining", n: rem, col: cssVar("--blue"), bg: cssVar("--accentbg") },
-    { key: "", label: state.platform === "all" ? "Total checks" : "Total", n: total, col: cssVar("--text2"), bg: cssVar("--neutbg") }
+    { key: "NA", label: "Not applicable", n: c.NA, col: cssVar("--text2"), bg: cssVar("--neutbg"), ofGrand: true },
+    { key: "", label: state.platform === "all" ? "Applicable checks" : "Applicable", n: total, col: cssVar("--text2"), bg: cssVar("--neutbg") }
   ];
   var kb = document.getElementById("kpis");
   kb.innerHTML = "";
   defs.forEach(function (d) {
-    var pct = total ? Math.round((d.key === "" ? 100 : d.n / total * 100) * 10) / 10 : 0;
+    var denom = d.ofGrand ? grand : total;
+    var pct = denom ? Math.round((d.key === "" ? 100 : d.n / denom * 100) * 10) / 10 : 0;
     var div = document.createElement("div");
     var on = d.key ? state.status === d.key : state.status === "";
     div.className = "kpi" + (on ? " on" : "");
@@ -599,7 +617,7 @@ function render(animate) {
   });
 
   // Big bar + legend
-  var completion = total ? Math.round(tested / total * 100) : 0;
+  var completion = total ? Math.round((tested + c.partial) / total * 100) : 0;
   document.getElementById("bigpct").innerHTML = total
     ? completion + '%<span style="font-size:13px;font-weight:600;color:var(--muted);margin-left:7px">completed</span>'
     : "–";
@@ -611,10 +629,15 @@ function render(animate) {
   };
   animate ? requestAnimationFrame(setBar) : setBar();
   var lg = [["Passed", c.Pass, "--green"], ["Failed", c.Fail, "--red"], ["Blocked", c.Blocked, "--amber"], ["Remaining", rem, "--blue"]];
-  document.getElementById("legend").innerHTML = lg.map(function (x) {
+  var legendHtml = lg.map(function (x) {
     var pc = total ? Math.round(x[1] / total * 1000) / 10 : 0;
     return '<span><span class="dot" style="background:' + cssVar(x[2]) + '"></span>' + x[0] + " " + x[1] + " (" + pc + "%)</span>";
   }).join("");
+  var notes = [];
+  if (c.NA) notes.push(c.NA + " NA excluded");
+  overrides.forEach(function (o) { notes.push(esc(o.name) + " counted at " + o.pct + "%"); });
+  if (notes.length) legendHtml += '<span style="grid-column:1/-1;font-size:11px;color:var(--muted)">' + notes.join(" · ") + "</span>";
+  document.getElementById("legend").innerHTML = legendHtml;
 
   // Team progress (checks within scope)
   var teams = {};
