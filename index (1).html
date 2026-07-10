@@ -92,6 +92,12 @@
   .btn:hover { background: var(--hover); text-decoration: none; }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn.primary:hover { filter: brightness(1.08); }
+  .ovrbadge {
+    display: inline-flex; align-items: center; margin-left: 10px; vertical-align: 6px;
+    font-size: 13px; font-weight: 600; color: #6d4fc4; background: #f1ecfb;
+    border: 1px solid #c8b6f0; border-radius: 9px; padding: 7px 14px; white-space: nowrap;
+  }
+  [data-theme="dark"] .ovrbadge { color: #c9b8f2; background: #292045; border-color: #55429a; }
   .themebtn {
     width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
     border: 1px solid var(--border2); background: var(--card); color: var(--text);
@@ -409,10 +415,7 @@ function load(csvText, updatedText) {
     else el.style.display = "none";
   });
   document.getElementById("ovrbadges").innerHTML = overrides.map(function (o) {
-    return '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:10px;vertical-align:6px;' +
-      'font-size:13px;font-weight:600;color:var(--accent);background:var(--accentbg);' +
-      'border:1px solid var(--accent);border-radius:9px;padding:7px 14px">' +
-      esc(o.name) + " " + o.pct + "%</span>";
+    return '<span class="ovrbadge">' + esc(o.name) + " " + o.pct + "%</span>";
   }).join("");
 
   var headers = grid[hIdx].map(norm);
