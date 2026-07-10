@@ -94,10 +94,11 @@
   .btn.primary:hover { filter: brightness(1.08); }
   .ovrbadge {
     display: inline-flex; align-items: center; margin-left: 10px; vertical-align: 6px;
-    font-size: 13px; font-weight: 600; color: #6d4fc4; background: #f1ecfb;
-    border: 1px solid #c8b6f0; border-radius: 9px; padding: 7px 14px; white-space: nowrap;
+    font-size: 13px; font-weight: 700; color: #ffffff; background: #7a3ff2;
+    border: 1px solid #7a3ff2; border-radius: 9px; padding: 7px 14px; white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(122, 63, 242, .35);
   }
-  [data-theme="dark"] .ovrbadge { color: #c9b8f2; background: #292045; border-color: #55429a; }
+  [data-theme="dark"] .ovrbadge { background: #8b5cf6; border-color: #8b5cf6; color: #fff; }
   .themebtn {
     width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
     border: 1px solid var(--border2); background: var(--card); color: var(--text);
@@ -628,9 +629,14 @@ function render(animate) {
 
   // Big bar + legend
   var completion = total ? Math.round((tested + c.partial) / total * 100) : 0;
-  document.getElementById("bigpct").innerHTML = total
+  var bigHtml = total
     ? completion + '%<span style="font-size:13px;font-weight:600;color:var(--muted);margin-left:7px">completed</span>'
     : "–";
+  overrides.forEach(function (o) {
+    bigHtml += '<span style="margin-left:22px;color:#7a3ff2">' + o.pct +
+      '%<span style="font-size:13px;font-weight:700;margin-left:7px">' + esc(o.name) + "</span></span>";
+  });
+  document.getElementById("bigpct").innerHTML = bigHtml;
   var bb = document.getElementById("bigbar");
   var setBar = function () {
     bb.children[0].style.cssText = "background:" + cssVar("--green") + ";width:" + (total ? c.Pass / total * 100 : 0) + "%";
@@ -655,8 +661,8 @@ function render(animate) {
     ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
       overrides.map(function (o) {
         return '<div class="mini"><div class="row1"><span class="name">' + esc(o.name) +
-          '</span><span class="val" style="font-weight:700;color:#6d4fc4">' + o.pct + "%</span></div>" +
-          '<div class="minitrack"><div style="background:#8b6fd8;width:' + Math.min(100, o.pct) + '%"></div></div></div>';
+          '</span><span class="val" style="font-weight:700;color:#7a3ff2">' + o.pct + "%</span></div>" +
+          '<div class="minitrack"><div style="background:#7a3ff2;width:' + Math.min(100, o.pct) + '%"></div></div></div>';
       }).join("") + "</div>"
     : "";
 
