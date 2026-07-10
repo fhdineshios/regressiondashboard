@@ -92,6 +92,12 @@
   .btn:hover { background: var(--hover); text-decoration: none; }
   .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn.primary:hover { filter: brightness(1.08); }
+  .ovrbadge {
+    display: inline-flex; align-items: center; margin-left: 10px; vertical-align: 6px;
+    font-size: 13px; font-weight: 600; color: #6d4fc4; background: #f1ecfb;
+    border: 1px solid #c8b6f0; border-radius: 9px; padding: 7px 14px; white-space: nowrap;
+  }
+  [data-theme="dark"] .ovrbadge { color: #c9b8f2; background: #292045; border-color: #55429a; }
   .themebtn {
     width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
     border: 1px solid var(--border2); background: var(--card); color: var(--text);
@@ -249,7 +255,7 @@
     <div class="toprow">
       <div class="titleblock">
         <h1 id="title">Regression</h1><span class="badge">Active</span>
-        <a class="btn primary" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:12px;vertical-align:6px">Jira Bug List &#8599;</a>
+        <a class="btn primary" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:12px;vertical-align:6px">Jira Bug List &#8599;</a><span id="ovrbadges"></span>
         <div class="metas">
           <div class="meta"><div class="k">Last updated</div><div class="v" id="mUpdated">–</div></div>
           <div class="meta"><div class="k">Total features</div><div class="v" id="mTotal">–</div></div>
@@ -271,6 +277,7 @@
         <div class="bigpct" id="bigpct">–</div>
         <div class="bigbar" id="bigbar"><div></div><div></div><div></div></div>
         <div class="legend" id="legend"></div>
+        <div id="modprogress"></div>
       </div>
       <div class="panel">
         <h3>Team Progress</h3>
@@ -408,6 +415,9 @@ function load(csvText, updatedText) {
     if (filterUrl) { el.href = filterUrl; el.style.display = ""; }
     else el.style.display = "none";
   });
+  document.getElementById("ovrbadges").innerHTML = overrides.map(function (o) {
+    return '<span class="ovrbadge">' + esc(o.name) + " " + o.pct + "%</span>";
+  }).join("");
 
   var headers = grid[hIdx].map(norm);
   var cFeature = findCol(headers, [/feature/i]);
@@ -638,6 +648,17 @@ function render(animate) {
   overrides.forEach(function (o) { notes.push(esc(o.name) + " counted at " + o.pct + "%"); });
   if (notes.length) legendHtml += '<span style="grid-column:1/-1;font-size:11px;color:var(--muted)">' + notes.join(" · ") + "</span>";
   document.getElementById("legend").innerHTML = legendHtml;
+
+  // Module-level percentages (e.g. Pre-Order) as secondary progress bars
+  var mp = document.getElementById("modprogress");
+  mp.innerHTML = overrides.length
+    ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
+      overrides.map(function (o) {
+        return '<div class="mini"><div class="row1"><span class="name">' + esc(o.name) +
+          '</span><span class="val" style="font-weight:700;color:#6d4fc4">' + o.pct + "%</span></div>" +
+          '<div class="minitrack"><div style="background:#8b6fd8;width:' + Math.min(100, o.pct) + '%"></div></div></div>';
+      }).join("") + "</div>"
+    : "";
 
   // Team progress (checks within scope)
   var teams = {};
