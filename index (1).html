@@ -277,6 +277,7 @@
         <div class="bigpct" id="bigpct">–</div>
         <div class="bigbar" id="bigbar"><div></div><div></div><div></div></div>
         <div class="legend" id="legend"></div>
+        <div id="modprogress"></div>
       </div>
       <div class="panel">
         <h3>Team Progress</h3>
@@ -647,6 +648,17 @@ function render(animate) {
   overrides.forEach(function (o) { notes.push(esc(o.name) + " counted at " + o.pct + "%"); });
   if (notes.length) legendHtml += '<span style="grid-column:1/-1;font-size:11px;color:var(--muted)">' + notes.join(" · ") + "</span>";
   document.getElementById("legend").innerHTML = legendHtml;
+
+  // Module-level percentages (e.g. Pre-Order) as secondary progress bars
+  var mp = document.getElementById("modprogress");
+  mp.innerHTML = overrides.length
+    ? '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">' +
+      overrides.map(function (o) {
+        return '<div class="mini"><div class="row1"><span class="name">' + esc(o.name) +
+          '</span><span class="val" style="font-weight:700;color:#6d4fc4">' + o.pct + "%</span></div>" +
+          '<div class="minitrack"><div style="background:#8b6fd8;width:' + Math.min(100, o.pct) + '%"></div></div></div>';
+      }).join("") + "</div>"
+    : "";
 
   // Team progress (checks within scope)
   var teams = {};
