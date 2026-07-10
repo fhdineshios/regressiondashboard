@@ -241,7 +241,7 @@
       Remaining
     </button>
     <div class="spacer"></div>
-    <a class="sidejira" id="sidejira" href="#" target="_blank" rel="noopener" style="display:none">Open Jira defect filter &#8599;</a>
+    <a class="sidejira" id="sidejira" href="#" target="_blank" rel="noopener" style="display:none">Open Jira bug list &#8599;</a>
   </aside>
 
   <main class="main">
@@ -249,7 +249,7 @@
     <div class="toprow">
       <div class="titleblock">
         <h1 id="title">Regression</h1><span class="badge">Active</span>
-        <a class="btn primary" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:12px;vertical-align:6px">Open Jira Filter &#8599;</a>
+        <a class="btn primary" id="jiralink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:12px;vertical-align:6px">Jira Bug List &#8599;</a>
         <div class="metas">
           <div class="meta"><div class="k">Last updated</div><div class="v" id="mUpdated">–</div></div>
           <div class="meta"><div class="k">Total features</div><div class="v" id="mTotal">–</div></div>
@@ -397,6 +397,8 @@ function load(csvText, updatedText) {
     if (!runTitle) runTitle = c;
   });
   if (runTitle) document.getElementById("title").textContent = runTitle;
+  // Default bug-filter link (used when the CSV top row has no URL)
+  if (!filterUrl) filterUrl = "https://touch2success.atlassian.net/issues?filter=26613&jql=labels%20IN%20(12.7_App%2C%2012.7_Web)%20ORDER%20BY%20priority%20ASC%2C%20created%20DESC%2C%20status%20DESC";
   ["jiralink", "sidejira"].forEach(function (id) {
     var el = document.getElementById(id);
     if (filterUrl) { el.href = filterUrl; el.style.display = ""; }
@@ -597,7 +599,10 @@ function render(animate) {
   });
 
   // Big bar + legend
-  document.getElementById("bigpct").textContent = total ? rate + "%" : "–";
+  var completion = total ? Math.round(tested / total * 100) : 0;
+  document.getElementById("bigpct").innerHTML = total
+    ? completion + '%<span style="font-size:13px;font-weight:600;color:var(--muted);margin-left:7px">completed</span>'
+    : "–";
   var bb = document.getElementById("bigbar");
   var setBar = function () {
     bb.children[0].style.cssText = "background:" + cssVar("--green") + ";width:" + (total ? c.Pass / total * 100 : 0) + "%";
@@ -664,7 +669,8 @@ function render(animate) {
       'stroke-dashoffset="' + (-off * CIRC + CIRC / 4) + '" />';
     off += frac;
   });
-  svg += '<text x="55" y="60" text-anchor="middle" font-size="17" font-weight="700" fill="' + cssVar("--text") + '">' + (total ? rate + "%" : "–") + "</text>";
+  svg += '<text x="55" y="52" text-anchor="middle" font-size="16" font-weight="700" fill="' + cssVar("--text") + '">' + (total ? completion + "%" : "–") + "</text>";
+  svg += '<text x="55" y="66" text-anchor="middle" font-size="8.5" fill="' + cssVar("--muted") + '">completed</text>';
   donut.innerHTML = svg;
   document.getElementById("dlegend").innerHTML = segs.map(function (s) {
     var pc = total ? Math.round(s[1] / total * 1000) / 10 : 0;
