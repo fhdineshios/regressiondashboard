@@ -521,12 +521,12 @@ function rowBad(r) { return rowHas(r, "Fail") || rowHas(r, "Blocked"); }
 
 // Counts of CHECKS (feature x platform) in current scope
 function checkCounts() {
-  var c = { Pass: 0, Fail: 0, Blocked: 0, NA: 0, Remaining: 0, total: 0, partial: 0 };
+  var c = { Pass: 0, Fail: 0, Blocked: 0, NA: 0, Remaining: 0, total: 0, partial: 0, ovrN: 0 };
   allRows.forEach(function (r) {
     rowStatuses(r).forEach(function (s) {
       c[s]++; c.total++;
       // A module with a manual % contributes that fraction for its untested, applicable checks
-      if (r.ovr && s === "Remaining") c.partial += r.ovr.pct / 100;
+      if (r.ovr && s === "Remaining") { c.partial += r.ovr.pct / 100; c.ovrN++; }
     });
   });
   return c;
@@ -628,9 +628,12 @@ function render(animate) {
   });
 
   // Big bar + legend
-  var completion = total ? Math.round((tested + c.partial) / total * 100) : 0;
-  var bigHtml = total
-    ? completion + '%<span style="font-size:13px;font-weight:600;color:var(--muted);margin-left:7px">completed</span>'
+  // Final regression % = passed / tested (NA and not-yet-tested excluded);
+  // module overrides count their untested checks at the given %
+  var testedEff = tested + c.ovrN;
+  var completion = testedEff ? Math.round((c.Pass + c.partial) / testedEff * 100) : 0;
+  var bigHtml = testedEff
+    ? completion + '%<span style="font-size:13px;font-weight:600;color:var(--muted);margin-left:7px">pass rate</span>'
     : "–";
   overrides.forEach(function (o) {
     bigHtml += '<span style="margin-left:22px;color:#7a3ff2">' + o.pct +
@@ -650,6 +653,7 @@ function render(animate) {
     return '<span><span class="dot" style="background:' + cssVar(x[2]) + '"></span>' + x[0] + " " + x[1] + " (" + pc + "%)</span>";
   }).join("");
   var notes = [];
+  notes.push("% = passed of tested (NA & untested excluded)");
   if (c.NA) notes.push(c.NA + " NA excluded");
   overrides.forEach(function (o) { notes.push(esc(o.name) + " counted at " + o.pct + "%"); });
   if (notes.length) legendHtml += '<span style="grid-column:1/-1;font-size:11px;color:var(--muted)">' + notes.join(" · ") + "</span>";
@@ -719,8 +723,8 @@ function render(animate) {
       'stroke-dashoffset="' + (-off * CIRC + CIRC / 4) + '" />';
     off += frac;
   });
-  svg += '<text x="55" y="52" text-anchor="middle" font-size="16" font-weight="700" fill="' + cssVar("--text") + '">' + (total ? completion + "%" : "–") + "</text>";
-  svg += '<text x="55" y="66" text-anchor="middle" font-size="8.5" fill="' + cssVar("--muted") + '">completed</text>';
+  svg += '<text x="55" y="52" text-anchor="middle" font-size="16" font-weight="700" fill="' + cssVar("--text") + '">' + (testedEff ? completion + "%" : "–") + "</text>";
+  svg += '<text x="55" y="66" text-anchor="middle" font-size="8.5" fill="' + cssVar("--muted") + '">pass rate</text>';
   donut.innerHTML = svg;
   document.getElementById("dlegend").innerHTML = segs.map(function (s) {
     var pc = total ? Math.round(s[1] / total * 1000) / 10 : 0;
